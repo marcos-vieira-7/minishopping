@@ -4,6 +4,8 @@ type FormFieldProps = {
   name: string;
   type?: string;
   placeholder?: string;
+  value: string | number;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 export default function FormField({

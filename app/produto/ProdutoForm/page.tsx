@@ -1,8 +1,30 @@
-
+"use client";
 import FormField from "@/app/components/FormField/page";
+import { useState } from "react";
 
 
 export default function ProdutoForm() {
+
+    const [form, setForm] = useState({
+        nome: "",
+        preco: "",
+        estoque: "",
+        categoria: "",
+    })
+
+    function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+        const { name, value} = e.target;
+
+        setForm((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    }
+
+    function handleSubmit(e: React.FormEvent) {
+        e.preventDefault();
+        console.log(form);
+    }
 
   return (
     <section className="mx-auto max-w-xl">
@@ -18,17 +40,21 @@ export default function ProdutoForm() {
         </header>
 
         {/* Formulário */}
-        <form className="space-y-4">
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <FormField
             label="Nome do produto"
             name="nome"
             placeholder="Ex: Paçoca"
+            value={form.nome}
+            onChange={handleChange}
           />
 
           <FormField
             label="Preço (R$)"
             name="preco"
             type="number"
+            value={form.preco}
+            onChange={handleChange}
             placeholder="Ex: 2.50"
           />
 
@@ -36,12 +62,16 @@ export default function ProdutoForm() {
             label="Quantidade em estoque"
             name="estoque"
             type="number"
+            value={form.estoque}
+            onChange={handleChange}
             placeholder="Ex: 100"
           />
 
           <FormField
             label="Categoria"
             name="categoria"
+            value={form.categoria}
+            onChange={handleChange}
             placeholder="Ex: Doces"
           />
 
