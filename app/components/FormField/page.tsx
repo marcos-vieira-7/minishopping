@@ -11,6 +11,8 @@ type FormFieldProps = {
 export default function FormField({
   label,
   name,
+  value,
+  onChange,
   type = "text",
   placeholder,
 }: FormFieldProps) {
@@ -25,7 +27,9 @@ export default function FormField({
       <input
         id={name}
         name={name}
+        value={value}
         type={type}
+        onChange={onChange}
         placeholder={placeholder}
         className="rounded-md border border-gray-300 px-3 py-2 text-sm
                    focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"/>
