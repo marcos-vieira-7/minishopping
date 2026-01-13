@@ -21,9 +21,10 @@ export default function Carrinho() {
 
     const [carrinho, setCarrinho] = useState<any>([]);
     const [item, setItem] = useState({
-        produtoId: "", 
+        produtoId: "",
         quantidade: 1,
         precoUnitario: 0,
+        nomeProduto: ""
     });
 
     function handleSubmit(e: React.FormEvent) {
@@ -43,10 +44,11 @@ export default function Carrinho() {
             const produtoSelecionado = produtos.find(
                 (p) => p.id === value
             );
-            setItem((prev) => ({
+            setItem((prev:any) => ({
                 ...prev,
                 produtoId: value,
                 precoUnitario: produtoSelecionado ? produtoSelecionado.preco: 0,
+                nomeProduto: produtoSelecionado?.nome,
             }));
 
             return;
@@ -83,15 +85,29 @@ export default function Carrinho() {
         return acc + item.precoUnitario * item.quantidade;
     }, 0);
 
+
+    function formatarReal(valor: number|string) {
+
+        let _valor = valor;
+        if (typeof valor == "string") {
+            _valor = Number(valor);
+        }
+
+        return _valor.toLocaleString("pt-BR", {
+            style: "currency",
+            currency: "BRL",
+        })
+    }
+
     return(
     <section className="mx-auto max-w-xl">
         <div className="rounded-lg bg-white p-6 shadow-sm">
             {/* Cabeçalho */}
-            <header className="mb-6">
+            <header className="mb-6 text-center">
             <h2 className="text-xl font-semibold text-gray-800">
                 Carrinho
             </h2>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 font-bold">
                 Adicionar Item
             </p>
             </header>
@@ -110,6 +126,17 @@ export default function Carrinho() {
                 }))}      
             />
 
+
+            <div className="flex flex-col gap-1">
+                <label
+                    htmlFor="precoUnitario"
+                    className="text-sm font-medium text-gray-700">
+                    Preço Unitário
+                </label>
+                <input name="precoUnitario" disabled value={formatarReal(item.precoUnitario)} 
+                    className="bg-gray-100 text-gray-500 font-medium rounded-sm p-1"/>
+            </div>
+
             <FormField
                 label="Quantidade"
                 name="quantidade"
@@ -123,7 +150,7 @@ export default function Carrinho() {
             <p className="text-right text-sm text-gray-600">
                 Total:{" "}
                 <strong>
-                    R$ {total.toFixed(2)}
+                    {formatarReal(total.toFixed(2))}
                 </strong>
             </p>
 
@@ -150,11 +177,15 @@ export default function Carrinho() {
                 {carrinho.map((item: any, index: any) => (
                     <li key={index} className="flex justify-between rounded-md border p-3 text-sm">
                         <span>
-                            Produto ID : {item.produtoId} - Qtd: {item.quantidade} 
+                            <strong>{item.quantidade} x</strong>
+                        </span>
+
+                        <span>
+                            <strong>{item.nomeProduto}</strong>
                         </span>
 
                         <strong>
-                            R$ {(item.precoUnitario * item.quantidade).toFixed(2)}
+                            {formatarReal((item.precoUnitario * item.quantidade).toFixed(2))}
                         </strong>
 
                         <button
@@ -170,7 +201,7 @@ export default function Carrinho() {
             <div className="mt-6 rounded-lg bg-gray-100 p-6 text-right">
                 <p className="text-sm text-gray-500">Total do Carrinho</p>
                 <p className="text-3xl font-bold text-green-600">
-                    R$ {totalCarrinho.toFixed(2)}
+                    {formatarReal(totalCarrinho.toFixed(2))}
                 </p>
             </div>
 
