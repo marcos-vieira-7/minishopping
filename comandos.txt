@@ -1,6 +1,12 @@
 
 npm run dev
 
+Prima orm:
+ npm install prisma --save-dev
+ npm install @prisma/client
+ npx prisma init
+
+
 ---
 
 
@@ -11,5 +17,5 @@ Progresso:
 
 ---
 CheckPoint:
-- Melhorar visual.
+- Parei no salvar produto na api do prisma; Erro ao salvar?
 - 

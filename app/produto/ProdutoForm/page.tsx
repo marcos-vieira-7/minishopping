@@ -26,6 +26,30 @@ export default function ProdutoForm() {
         console.log(form);
     }
 
+
+  async function salvarProduto() {
+    const res = await fetch("/api/produtos", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        nome: form.nome,
+        preco: form.preco,
+        estoque: form.estoque,
+        categoria: form.categoria,
+      }),
+    });
+
+    if(res.ok){
+      alert("Produto salvo com sucesso!");
+    } else {
+      const erro = await res.json();
+      alert(erro.message || "Erro ao salvar produto.");
+    }
+  }
+
+
   return (
     <section className="mx-auto max-w-xl">
       <div className="rounded-lg bg-white p-6 shadow-sm">
@@ -86,6 +110,7 @@ export default function ProdutoForm() {
             </button>
 
             <button
+              onClick={() => salvarProduto()}
               type="submit"
               className="rounded-md bg-blue-600 px-4 py-2 text-sm
                          font-medium text-white hover:bg-blue-700"
