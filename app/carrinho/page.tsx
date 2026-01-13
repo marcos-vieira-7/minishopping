@@ -2,6 +2,7 @@
 import FormField from "@/app/components/FormField/page";
 import SelectField from "../components/SelectField/SelectField";
 import { useState } from "react";
+import { randomUUID } from "crypto";
 
 type Produto = {
     id: string;
@@ -18,7 +19,7 @@ export default function Carrinho() {
         {id: "3", nome: "Pipa", preco: 3.9},
     ];
 
-    const [carrinho, setCarrinho] = useState([]);
+    const [carrinho, setCarrinho] = useState<any>([]);
     const [item, setItem] = useState({
         produtoId: "", 
         quantidade: 1,
@@ -36,6 +37,9 @@ export default function Carrinho() {
         const { name, value} = e.target;
 
         if (name === "produtoId") { //produto deve-se pegar o preco tbm.
+
+            item.quantidade = 1; //trocou produto, conserta qtd.
+
             const produtoSelecionado = produtos.find(
                 (p) => p.id === value
             );
@@ -57,9 +61,27 @@ export default function Carrinho() {
     function adicionarAoCarrinho() {
         console.log(item);
         //TODO: set no carrinho.
+        setCarrinho((prev: any) => [...prev, item]);
     }
 
     console.log("renderizou", item);
+
+
+    function removerItem(indexToRemove: number) {
+
+        let confirmar = window.confirm("Você confirma a exclusão do item?");
+
+        if (confirmar) {
+            setCarrinho((prev:any) =>
+                prev.filter((_:any,index:any) => index !== indexToRemove)
+            );
+        }
+        return;
+    }
+
+    const totalCarrinho = carrinho.reduce((acc:any, item:any) => {
+        return acc + item.precoUnitario * item.quantidade;
+    }, 0);
 
     return(
     <section className="mx-auto max-w-xl">
@@ -75,6 +97,7 @@ export default function Carrinho() {
             </header>
 
             {/* Formulário */}
+            <div className="rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-200">
             <form className="space-y-4" onSubmit={handleSubmit}>
             <SelectField
                 label="Produto"
@@ -121,6 +144,37 @@ export default function Carrinho() {
                 </button>
             </div>
             </form>
+            </div>
+
+            <ul className="mt-6 space-y-2">
+                {carrinho.map((item: any, index: any) => (
+                    <li key={index} className="flex justify-between rounded-md border p-3 text-sm">
+                        <span>
+                            Produto ID : {item.produtoId} - Qtd: {item.quantidade} 
+                        </span>
+
+                        <strong>
+                            R$ {(item.precoUnitario * item.quantidade).toFixed(2)}
+                        </strong>
+
+                        <button
+                            onClick={() => removerItem(index)}
+                            className="text-red-500 text-sm hover:underline">
+                                Excluir
+                        </button>
+
+                    </li>
+                ))}
+            </ul>
+
+            <div className="mt-6 rounded-lg bg-gray-100 p-6 text-right">
+                <p className="text-sm text-gray-500">Total do Carrinho</p>
+                <p className="text-3xl font-bold text-green-600">
+                    R$ {totalCarrinho.toFixed(2)}
+                </p>
+            </div>
+
+
         </div>
     </section>
     );
