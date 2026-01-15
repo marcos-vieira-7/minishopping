@@ -1,9 +1,13 @@
 "use client";
 import FormField from "@/app/components/FormField/page";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+const TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY4NTA4NzE5LCJpYXQiOjE3Njg1MDY5MTksImp0aSI6ImE4ODM1MWViNzhhMzQ1ODI5YWQ5OTZiMzY3M2MxZTJlIiwidXNlcl9pZCI6IjEifQ.iMrgahLHAdOssh29_QxKxqkRHm4GM-B7lwqqY4flWoI"
 
 export default function ProdutoForm() {
+
+    const router = useRouter();
 
     const [form, setForm] = useState({
         nome: "",
@@ -28,10 +32,12 @@ export default function ProdutoForm() {
 
 
   async function salvarProduto() {
-    const res = await fetch("/api/produtos", {
+    console.log("ss",`${process.env.NEXT_PUBLIC_API_URL}/api/produtos/`);
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/produtos/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${TOKEN}`, // se usar JWT
       },
       body: JSON.stringify({
         nome: form.nome,

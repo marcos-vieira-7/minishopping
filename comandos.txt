@@ -17,5 +17,5 @@ Progresso:
 
 ---
 CheckPoint:
-- Parei no salvar produto na api do prisma; Erro ao salvar?
+- Parei no salvar produto na api?
 - 
