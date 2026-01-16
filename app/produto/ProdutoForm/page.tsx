@@ -1,13 +1,22 @@
 "use client";
 import FormField from "@/app/components/FormField/page";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useRef } from "react";
+import Toast from "@/app/components/Toast/page";
 
-const TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY4NTA4NzE5LCJpYXQiOjE3Njg1MDY5MTksImp0aSI6ImE4ODM1MWViNzhhMzQ1ODI5YWQ5OTZiMzY3M2MxZTJlIiwidXNlcl9pZCI6IjEifQ.iMrgahLHAdOssh29_QxKxqkRHm4GM-B7lwqqY4flWoI"
+
+const TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY4NTkwMTM4LCJpYXQiOjE3Njg1ODgzMzgsImp0aSI6IjlhMDMxY2Y4NzJjZTQ1Nzg5MDk0MzAyNDkyZDU5YTI3IiwidXNlcl9pZCI6IjEifQ.bme5guIQch11YzsmswgnvxoYIYgkm-UGkS4OIRz8_UA"
 
 export default function ProdutoForm() {
 
     const router = useRouter();
+
+    const [toast, setToast] = useState({
+      message: "",
+      type: "success",
+      visible: false,
+    });
+    const timeoutRef:any = useRef(null);
 
     const [form, setForm] = useState({
         nome: "",
@@ -15,6 +24,27 @@ export default function ProdutoForm() {
         estoque: "",
         categoria: "",
     })
+
+    function showToast(message="", type = "success") {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      // entra
+      setToast({ message, type, visible: true });
+      // sai
+      timeoutRef.current = setTimeout(() => {
+        setToast((prev) => ({
+          ...prev,
+          visible: false,
+        }));
+      }, 2500);
+
+      // remove do DOM depois da animação
+      setTimeout(() => {
+        setToast({ message: "", type, visible: false });
+      }, 3000);
+    }
+
 
     function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
         const { name, value} = e.target;
@@ -48,10 +78,16 @@ export default function ProdutoForm() {
     });
 
     if(res.ok){
-      alert("Produto salvo com sucesso!");
+      showToast("Produto cadastrado com sucesso!", "success");
+      setForm({
+        nome: "",
+        preco: "",
+        estoque: "",
+        categoria: "",
+      });
     } else {
       const erro = await res.json();
-      alert(erro.message || "Erro ao salvar produto.");
+      showToast("Erro ao cadastrar produto", "error");
     }
   }
 
@@ -68,6 +104,13 @@ export default function ProdutoForm() {
             Preencha os dados do produto para adicionar ao sistema
           </p>
         </header>
+
+        {/* Mensagens  */}
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          visible={toast.visible}
+         />
 
         {/* Formulário */}
         <form className="space-y-4" onSubmit={handleSubmit}>
