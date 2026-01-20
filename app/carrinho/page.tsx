@@ -1,55 +1,64 @@
 "use client";
 import FormField from "@/app/components/FormField/page";
 import SelectField from "../components/SelectField/SelectField";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { randomUUID } from "crypto";
+import { apiFetch } from "@/lib/api";
 
 type Produto = {
     id: string;
     nome: string;
-    preco: number;
+    preco: string|number;
 };
 
 export default function Carrinho() {
 
     //produtos (viriam da API)
-    const produtos: Produto[] = [
-        {id: "1", nome: "Paçoca", preco: 2.5},
-        {id: "2", nome: "Chips", preco: 5.0},
-        {id: "3", nome: "Pipa", preco: 3.9},
-    ];
-
+    const [produtos, setProdutos] = useState<Produto[]>([]);
     const [carrinho, setCarrinho] = useState<any>([]);
     const [item, setItem] = useState({
         produtoId: "",
         quantidade: 1,
-        precoUnitario: 0,
+        preco: 0,
         nomeProduto: ""
     });
+    const total = item.preco * item.quantidade; //calulo do total do item pedido
+
+
+    useEffect(() => {
+        async function carregarProdutos() {
+            const res = await apiFetch("http://localhost:8000/api/produtos/");
+            const data = await res.json();
+            setProdutos(data);
+            console.log("PROD?", data);
+        }
+        carregarProdutos();
+    }, []);
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         console.log(carrinho);
     }
 
-    const total = item.precoUnitario * item.quantidade; //calulo do total do item pedido
 
     function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
         const { name, value} = e.target;
-
+        
         if (name === "produtoId") { //produto deve-se pegar o preco tbm.
 
             item.quantidade = 1; //trocou produto, conserta qtd.
 
             const produtoSelecionado = produtos.find(
-                (p) => p.id === value
+                (p) => String(p.id) === value
             );
             setItem((prev:any) => ({
                 ...prev,
                 produtoId: value,
-                precoUnitario: produtoSelecionado ? produtoSelecionado.preco: 0,
+                preco: produtoSelecionado ? produtoSelecionado.preco: 0,
                 nomeProduto: produtoSelecionado?.nome,
             }));
+
+            console.log("PRODUT???",produtoSelecionado?.preco,);
 
             return;
         }
@@ -82,7 +91,7 @@ export default function Carrinho() {
     }
 
     const totalCarrinho = carrinho.reduce((acc:any, item:any) => {
-        return acc + item.precoUnitario * item.quantidade;
+        return acc + item.preco * item.quantidade;
     }, 0);
 
 
@@ -115,6 +124,7 @@ export default function Carrinho() {
             {/* Formulário */}
             <div className="rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-200">
             <form className="space-y-4" onSubmit={handleSubmit}>
+                
             <SelectField
                 label="Produto"
                 name="produtoId"
@@ -129,11 +139,11 @@ export default function Carrinho() {
 
             <div className="flex flex-col gap-1">
                 <label
-                    htmlFor="precoUnitario"
+                    htmlFor="preco"
                     className="text-sm font-medium text-gray-700">
                     Preço Unitário
                 </label>
-                <input name="precoUnitario" disabled value={formatarReal(item.precoUnitario)} 
+                <input name="preco" disabled value={formatarReal(item.preco)} 
                     className="bg-gray-100 text-gray-500 font-medium rounded-sm p-1"/>
             </div>
 
@@ -185,7 +195,7 @@ export default function Carrinho() {
                         </span>
 
                         <strong>
-                            {formatarReal((item.precoUnitario * item.quantidade).toFixed(2))}
+                            {formatarReal((item.preco * item.quantidade).toFixed(2))}
                         </strong>
 
                         <button

@@ -3,9 +3,10 @@ import FormField from "@/app/components/FormField/page";
 import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
 import Toast from "@/app/components/Toast/page";
+import { apiFetch } from "@/lib/api";
 
+// const TOKEN = localStorage.getItem("token");
 
-const TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY4NTkwMTM4LCJpYXQiOjE3Njg1ODgzMzgsImp0aSI6IjlhMDMxY2Y4NzJjZTQ1Nzg5MDk0MzAyNDkyZDU5YTI3IiwidXNlcl9pZCI6IjEifQ.bme5guIQch11YzsmswgnvxoYIYgkm-UGkS4OIRz8_UA"
 
 export default function ProdutoForm() {
 
@@ -63,12 +64,12 @@ export default function ProdutoForm() {
 
   async function salvarProduto() {
     console.log("ss",`${process.env.NEXT_PUBLIC_API_URL}/api/produtos/`);
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/produtos/`, {
+    const res = await apiFetch(`${process.env.NEXT_PUBLIC_API_URL}/api/produtos/`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${TOKEN}`, // se usar JWT
-      },
+      // headers: {
+      //   "Content-Type": "application/json",
+      //   Authorization: `Bearer ${TOKEN}`, // se usar JWT
+      // },
       body: JSON.stringify({
         nome: form.nome,
         preco: form.preco,
