@@ -1,9 +1,16 @@
+function getAccessToken() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+  return localStorage.getItem("accessToken");
+}
+
 
 export async function apiFetch(
   url: string,
   options: RequestInit = {}
 ) {
-  const token = localStorage.getItem("accessToken");
+  const token = getAccessToken();
 
   const headers = {
     "Content-Type": "application/json",
