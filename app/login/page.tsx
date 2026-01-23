@@ -36,19 +36,19 @@ export default function LoginPage() {
     localStorage.setItem("refreshToken", data.refresh);
 
     // redirecionar
-    window.location.href = "/produto/ProdutoForm";
+    window.location.href = "/carrinho";
   }
 
 
   return (
-    <div className="max-w-sm mx-auto mt-20 space-y-4">
-      <h1 className="text-xl font-semibold">Login</h1>
+    <div className="max-w-md mx-auto mt-20 space-y-4 p-14 rounded-3xl bg-white shadow-md">
+      <h1 className="text-xl font-semibold text-center">Login</h1>
 
       <input
         placeholder="Usuário"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
-        className="border p-2 w-full"
+        className="border rounded-sm p-2 w-full focus:outline-none focus:ring-0"
       />
 
       <input
@@ -56,7 +56,7 @@ export default function LoginPage() {
         type="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        className="border p-2 w-full"
+        className="border rounded-sm p-2 w-full focus:outline-none focus:ring-0"
       />
 
       {error && <p className="mb-2 text-sm text-red-500">{error}</p>}
@@ -64,7 +64,7 @@ export default function LoginPage() {
       <button
         onClick={handleLogin}
         disabled={loading}
-        className="bg-blue-600 text-white w-full p-2 rounded"
+        className="bg-blue-600 text-white w-full p-2 rounded mt-6 flex mx justify-center"
       >
         {loading ? "Entrando..." : "Entrar"}
       </button>
