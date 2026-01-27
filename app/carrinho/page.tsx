@@ -1,9 +1,10 @@
 "use client";
 import FormField from "@/app/components/FormField/page";
 import SelectField from "../components/SelectField/SelectField";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { randomUUID } from "crypto";
 import { apiFetch } from "@/lib/api";
+import Toast from "@/app/components/Toast/page";
 
 type Produto = {
     id: string;
@@ -14,6 +15,13 @@ type Produto = {
 export default function Carrinho() {
 
     //produtos (viriam da API)
+    const [toast, setToast] = useState({
+      message: "",
+      type: "success",
+      visible: false,
+    });
+    const timeoutRef:any = useRef(null);
+
     const [produtos, setProdutos] = useState<Produto[]>([]);
     const [carrinho, setCarrinho] = useState<any>([]);
     const [item, setItem] = useState({
@@ -24,6 +32,25 @@ export default function Carrinho() {
     });
     const total = item.preco * item.quantidade; //calulo do total do item pedido
 
+    function showToast(message="", type = "success") {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      // entra
+      setToast({ message, type, visible: true });
+      // sai
+      timeoutRef.current = setTimeout(() => {
+        setToast((prev) => ({
+          ...prev,
+          visible: false,
+        }));
+      }, 2500);
+
+      // remove do DOM depois da animação
+      setTimeout(() => {
+        setToast({ message: "", type, visible: false });
+      }, 3000);
+    }
 
     useEffect(() => {
         async function carregarProdutos() {
@@ -72,7 +99,13 @@ export default function Carrinho() {
     function adicionarAoCarrinho() {
         console.log(item);
         //TODO: set no carrinho.
-        setCarrinho((prev: any) => [...prev, item]);
+        const itemExistente = carrinho.find((obj:any) => obj.produtoId === item.produtoId);
+
+        if(itemExistente){
+            showToast("Produto já cadastrado.", "error");
+        }else{
+            setCarrinho((prev: any) => [...prev, item]);
+        }
     }
 
     console.log("renderizou", item);
@@ -109,7 +142,7 @@ export default function Carrinho() {
     }
 
     return(
-    <section className="mx-auto max-w-xl">
+    <section className="mx-auto max-w-2xl">
         <div className="rounded-lg bg-white p-6 shadow-sm">
             {/* Cabeçalho */}
             <header className="mb-6 text-center">
@@ -120,6 +153,13 @@ export default function Carrinho() {
                 Adicionar Item
             </p>
             </header>
+
+            {/* Mensagens  */}
+            <Toast
+            message={toast.message}
+            type={toast.type}
+            visible={toast.visible}
+            />
 
             {/* Formulário */}
             <div className="rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-200">
@@ -183,7 +223,7 @@ export default function Carrinho() {
             </form>
             </div>
 
-            <ul className="mt-6 space-y-2">
+            {/* <ul className="mt-6 space-y-2">
                 {carrinho.map((item: any, index: any) => (
                     <li key={index} className="flex justify-between rounded-md border p-3 text-sm">
                         <span>
@@ -206,7 +246,43 @@ export default function Carrinho() {
 
                     </li>
                 ))}
-            </ul>
+            </ul> */}
+            <div className="text-center grid grid-cols-5 gap-3 font-semibold border-b pb-2 mb-2 mt-6">
+                <span className="">Produto</span>
+                <span className="text-center">Qtd</span>
+                <span className="text-right">Preço</span>
+                <span className="text-right">Total</span>
+                <span className="text-center">Ações</span>
+            </div>
+            {carrinho.map((item: any, index: any) => (
+                <div
+                    key={index}
+                    className="grid grid-cols-5 gap-3 items-center border-b py-2"
+                >
+                    <span className="">{item.nomeProduto}</span>
+
+                    <span className="text-center">
+                    {item.quantidade}
+                    </span>
+
+                    <span className="text-right">
+                        {formatarReal(item.preco)}
+                    </span>
+
+                    <span className="text-right font-medium">
+                        {formatarReal((item.preco * item.quantidade).toFixed(2))}
+                    </span>
+
+                    <button
+                        onClick={() => removerItem(index)}
+                        className="text-red-500 text-sm hover:underline">
+                            Excluir
+                    </button>
+                </div>
+            ))}
+
+
+
 
             <div className="mt-6 rounded-lg bg-gray-100 p-6 text-right">
                 <p className="text-sm text-gray-500">Total do Carrinho</p>
